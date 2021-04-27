@@ -1,0 +1,174 @@
+<html>
+    <head>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.3.1/p5.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/p5.collide2d"></script>
+    </head>
+    <style>
+        body{
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+        }
+    </style>
+    <body>
+        <p id="scoreBoard">score: </p>
+    <script>
+        var w = window.innerWidth;  var h = window.innerHeight; 
+        var x = w/2;   var y = h/2;
+        var points;    var points2;
+        var timer = 0; var timer2 = 0; var timer3 = 0; var timer4 = 0; var timer5 =0;
+        var playerOne; 
+        var colors= ["black", "red"]
+        var rand = Math.floor(Math.random()*colors.length);
+        var rancolors = colors[rand]; 
+        var scoreBoard = 0; 
+        var hit = false; 
+        var enemy; 
+        var time; 
+        var reset1; 
+        var rectNew = []; 
+        var newPoints2 = [];
+        
+
+        function setup(){
+            createCanvas(w,h);
+            points = new points();
+            points2 = new points2(); 
+            playerOne = new playerOne(); 
+            enemy = new enemy(); 
+            
+        }
+
+        function draw(){
+            clear();
+            points.show(); points.update();
+            points2.show(); points2.update(); 
+            playerOne.show();
+            enemy.show(); enemy.update();
+            for(let i =0; i<rectNew.length; i++){
+                rectNew[i].show();
+                rectNew[i].update();
+            }
+            if(millis()>=8000 + timer4){
+                    rectNew.push(Object.create(enemy));
+                    for(let i = 0; i<rectNew.length; i++){
+                        rectNew[i].x = random(0, w-50); 
+                        rectNew[i].y = random(0, h-50); 
+                    }
+                    enemy.x = random(0, w-50); 
+                    enemy.y = random(0, h-50); 
+                    timer4 = millis();
+             }
+             for(var i=0; i<newPoints2.length; i++){
+                 newPoints2[i].move();
+                 newPoints2[i].show(); 
+                 newPoints2[i].update();
+             }
+                points2.move();
+                points2.show();
+                points2.update();
+             if(millis()>=5000 +timer5){
+                 newPoints2.push(Object.create(points2)); 
+                 for(let i = 0; i<newPoints2.length; i++){
+                     newPoints2[i].x = random(0, w-50);
+                     newPoints2[i].y = random(0, h-50);
+                 }
+                 points2.x = random(0, w-50); 
+                 points2.y = random(0, h-50); 
+                 timer5 = millis();
+             }
+        }
+        function points(){
+            this.x = random(50, w-50);
+            this.y = random(50, h-50); 
+            this.show = function(){
+                rectMode(CORNER);
+                fill(color('black')); 
+                rect(this.x, this.y, 50, 50);
+            }
+            this.update = function(){      
+            hit = collideRectRect(playerOne.x , playerOne.y , 50 , 50, points.x, points.y, 50, 50 ); 
+             if (hit==true){
+                 points.x = random(0, w-50); 
+                 points.y = random(0, h-50); 
+             }
+            }
+        }
+
+        function playerOne(){
+            this.x = w/2
+            this.y = h/2 
+            this.show = function(){
+                rectMode(CORNER);
+                fill(color('blue'));
+                rect(this.x, this.y, 50, 50);
+                
+                if ((this.y>0) && keyIsDown(38)){
+                    this.y -= 10;
+                }
+                if ((this.y < h-50) && keyIsDown(40)){
+                    this.y += 10; 
+                }
+                if((this.x > 0) && keyIsDown(37)){
+                    this.x -= 10;
+             }
+                if((this.x < w-50) && keyIsDown(39)){
+                    this.x += 10;
+             }
+             hit = collideRectRect(playerOne.x , playerOne.y , 50 , 50, points.x, points.y, 50, 50 ); 
+             if (hit==true){
+                 scoreBoard += 10
+                 document.getElementById('scoreBoard').innerHTML = "score: " + scoreBoard;
+             }
+            }
+        
+        }
+
+        function points2(){
+            this.x = random(50, w-50);
+            this.y = random(50, h-50); 
+            this.xspeed = 1; 
+            this.yspeed = 1; 
+            this.show = function(){
+                rectMode(CORNER);
+                fill(color('red'))
+                rect(this.x, this.y, 15, 15); 
+            }
+            this.move = function(){
+                this.x = this.x + this.xspeed; 
+                this.y = this.y + this.yspeed; 
+                if(this.x+10 >= width || this.x<= 0){
+                    this.xspeed = this.xspeed *-1
+                }
+                if(this.y +10 >= height || this.y <= 0){
+                    this.yspeed = this.yspeed * -1
+                }
+            }
+            this.update = function(){ 
+                hit = collideRectRect(playerOne.x, playerOne.y, 50, 50, points2.x, points2.y, 50, 50)
+                if (hit==true){
+                window.alert("game over");
+            }
+                
+            }
+        }
+
+        function enemy(){
+            this.x = random(0, w-50);
+            this.y= random(0, h-50);
+            this.show = function(){
+                rectMode(CORNER);
+                fill(color('purple')); 
+                rect(this.x, this.y, 15, 15);
+            }
+            this.update = function(){
+            hit = collideRectRect(playerOne.x , playerOne.y , 50 , 50, enemy.x, enemy.y, 50, 50 ); 
+                if (hit==true){
+                    scoreBoard -= 10; 
+                document.getElementById('scoreBoard').innerHTML = "score: " + scoreBoard; 
+             }
+            }
+        }
+    </script>
+    </body>
+</html>
